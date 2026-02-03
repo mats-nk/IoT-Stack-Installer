@@ -3,19 +3,20 @@
 #===============================
 # IoT Monitoring Stack Installer
 # Author : Pak Sormin
+# Changes: Mats Karlsson
 #===============================
 
 set -e
 #-------------------------------------------------
-# Logic Harus Root & OS Ubuntu
+# The cript must be executed as root & OS Ubuntu
 #-------------------------------------------------
 if [[ $EUID -ne 0 ]]; then
-    echo "Script ini harus dijalankan sebagai root."
+    echo "This script must be run as root."
     exit 1
 fi
 
 if [[ ! -f /etc/os-release ]]; then 
-    echo "OS tidak dikenali!"
+    echo "Unknown OS!"
     exit 1
 fi
 
@@ -37,7 +38,7 @@ show_menu() {
     echo "2. Install InfluxDB"
     echo "3. Install Grafana"
     echo "4. Install Telegraf"
-    echo "0. Keluar"
+    echo "0. Exit"
     echo "------------------------------------------"
 }
 
@@ -46,7 +47,7 @@ show_menu() {
 #---------------------------------------------------
 install_mqtt() {
     echo ""
-    echo "[INFO] Menginstall MQTT Broker..."
+    echo "[INFO] Install MQTT Broker Mosquitto..."
 
     apt update
     apt install -y mosquitto mosquitto-clients
@@ -55,9 +56,9 @@ install_mqtt() {
     systemctl start mosquitto
 
     if systemctl is-active --quiet mosquitto; then
-        echo "[OK] MQTT Broker berhasil dijalankan"
+        echo "[OK] MQTT Broker installation sucessfull"
     else
-        echo "[ERROR] MQTT Broker gagal dijalankan"
+        echo "[ERROR] MQTT Broker installation failed"
         exit 1
     fi
 }
@@ -68,7 +69,7 @@ install_mqtt() {
 #---------------------------------------------------
 install_influxdb() {
     echo ""
-    echo "[INFO] Menginstall InfluxDB 2.x..."
+    echo "[INFO] Install InfluxDB 2.x..."
     echo ""
 
     apt update
@@ -111,7 +112,7 @@ install_influxdb() {
 #-----------------------------------------------------
 install_grafana() {
     echo ""
-    echo "[INFO] Menginstall Grafana dari APT Repository Resmi..."
+    echo "[INFO] Grafana was successfully installing from the Official APT Repository..."
     echo ""
 
     # Prerequisite
@@ -139,15 +140,15 @@ install_grafana() {
     systemctl start grafana-server
 
     if systemctl is-active --quiet grafana-server; then
-        echo "[OK] Grafana berhasil dijalankan"
+        echo "[OK] Grafana executed successfully"
     else
-        echo "[ERROR] Grafana gagal dijalankan"
+        echo "[ERROR] Grafana failed to run"
         exit 1
     fi
 
     echo ""
     echo "=========================================="
-    echo "Grafana Web UI dapat diakses melalui:"
+    echo "Grafana The Web UI can be accessed through:"
     echo "http://localhost:3000"
     echo "Username : admin"
     echo "Password : admin"
@@ -160,7 +161,7 @@ install_grafana() {
 
 install_telegraf() {
     echo ""
-    echo "[INFO] Menginstall Telegraf (tanpa menjalankan service)..."
+    echo "[INFO] Install Telegraf (without running the service)..."
     echo ""
 
     apt update
@@ -171,12 +172,12 @@ install_telegraf() {
 
     echo ""
     echo "=========================================="
-    echo "[INFO] Telegraf berhasil diinstal."
-    echo "[INFO] Service tidak dijalankan karena"
-    echo "       konfigurasi belum dibuat."
-    echo "Langkah berikutnya:"
-    echo " - Konfigurasi input MQTT"
-    echo " - Konfigurasi output InfluxDB"
+    echo "[INFO] Telegraph installed successfully."
+    echo "[INFO] Service not executed because the"
+    echo "       configure has not yet been created."
+    echo "Next step:"
+    echo " - Configure input MQTT"
+    echo " - Configure output InfluxDB"
     echo " - systemctl start telegraf"
     echo "=========================================="
 }
@@ -184,7 +185,7 @@ install_telegraf() {
 
 while true; do
     show_menu
-    read -p "Pilih Menu : " choice
+    read -p "Install menu: " choice
 
     case $choice in
         1)
@@ -200,11 +201,11 @@ while true; do
             install_telegraf
             ;;
         0)
-            echo "Keluar..."
+            echo "Exit..."
             exit 0
             ;;
         *)
-            echo "Pilihan tidak valid"
+            echo "Invalid selection"
             ;;
     esac
 done
